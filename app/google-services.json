@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "282878831889",
+    "project_id": "fir-groga1",
+    "storage_bucket": "fir-groga1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:282878831889:android:01392ffaf0a0fe307cf0b0",
+        "android_client_info": {
+          "package_name": "com.example.firebasegroga1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBdzTxBK1joYl4Hcxbnw0dywhh93Dst_4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
