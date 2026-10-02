@@ -40,7 +40,7 @@ class IkasleActivity : ComponentActivity() {
 
 @Composable
 fun Crud(bueltan: () -> Unit) {
-    var id by remember { mutableStateOf("")}
+    var nana by remember { mutableStateOf("")}
     var izena by remember { mutableStateOf("")}
     var abizena by remember { mutableStateOf("")}
 
@@ -59,9 +59,9 @@ fun Crud(bueltan: () -> Unit) {
             )
 
             OutlinedTextField(
-                value = id,
-                onValueChange = { id = it },
-                label = { Text(text = "id") },
+                value = nana,
+                onValueChange = { nana = it },
+                label = { Text(text = "nana") },
                 singleLine = true
             )
 
@@ -91,10 +91,21 @@ fun Crud(bueltan: () -> Unit) {
             ) { Text("Erakutsi") }
             Button(
                 onClick = {
-                    Gorde(id,izena,abizena){ resultado ->
-                        datos = resultado}
+                    Gorde(nana,izena,abizena,context)
                 }
             ) { Text("Gorde") }
+            Button(
+                onClick = {
+                    Aldatu(nana, izena, abizena, context)
+                }
+            ) { Text("Aldatu") }
+
+            Button(
+                onClick = {
+                    Ezabatu(nana,context)
+                }
+            ) { Text("Ezabatu") }
+
             Button(
                 onClick = {
                     bueltan()
@@ -106,25 +117,30 @@ fun Crud(bueltan: () -> Unit) {
 }
 
 fun Gorde(
-    id: String,
+    nana: String,
     izena: String,
     abizena: String,
-    resultado: (String) -> Unit) {
+    context: android.content.Context) {
 
     val db = FirebaseFirestore.getInstance()
     val ikaslea = User(
-        id = id,
+        nana = nana,
         izena = izena,
         abizena = abizena
     )
     db.collection("ikasleak")
         .add(ikaslea)
-        .addOnSuccessListener { documentReference ->
-                resultado("Docuemnto añadadios ${documentReference.id}\n")
-              }
+        .addOnSuccessListener { Toast.makeText(
+            context,
+            "Ikaslea gordeta",
+            Toast.LENGTH_SHORT
+        ).show()}
         .addOnFailureListener { e ->
-            resultado( "Error: ${e.message}")
-        }
+            Toast.makeText(
+                context,
+                "Errorea: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()        }
 }
 fun Erakutsi(resultado: (String) -> Unit) {
     val db = FirebaseFirestore.getInstance()
@@ -143,4 +159,100 @@ db.collection("ikasleak").get()
             resultado ( "Error: ${e.message}")
         }
         }
+fun Ezabatu(nana: String, context: android.content.Context) {
+    val db = FirebaseFirestore.getInstance()
 
+    db.collection("ikasleak")
+        .whereEqualTo("nana", nana)
+        .get()
+        .addOnSuccessListener { ikasleak ->
+
+            if (ikasleak.isEmpty) {
+                Toast.makeText(
+                    context,
+                    "Ez da ikaslea aurkitu",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                for (ikaslea in ikasleak) {
+                    db.collection("ikasleak")
+                        .document(ikaslea.id)
+                        .delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                context,
+                                "Ikaslea ezabatuta",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                context,
+                                "Errorea: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                }
+            }
+        }
+        .addOnFailureListener { e ->
+            Toast.makeText(
+                context,
+                "Errorea bilatzean: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+}
+fun Aldatu(
+    nana: String,
+    izena: String,
+    abizena: String,
+    context: android.content.Context
+) {
+    val db = FirebaseFirestore.getInstance()
+
+    db.collection("ikasleak")
+        .whereEqualTo("nana", nana)
+        .get()
+        .addOnSuccessListener { ikasleak ->
+
+            if (ikasleak.isEmpty) {
+                Toast.makeText(
+                    context,
+                    "Ez da ikaslea aurkitu",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                for (ikaslea in ikasleak) {
+
+                    db.collection("ikasleak")
+                        .document(ikaslea.id)
+                        .update(
+                            "izena", izena,
+                            "abizena", abizena
+                        )
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                context,
+                                "Ikaslea eguneratuta",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                context,
+                                "Errorea: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                }
+            }
+        }
+        .addOnFailureListener { e ->
+            Toast.makeText(
+                context,
+                "Errorea bilatzean: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+}
